@@ -1,0 +1,473 @@
+--- PAGE 1 ---
+DUELA TECH| MVP Business Model — Working Capital Financing  
+ MVP  Business  Model
+Working Capital Financing for Retail and Inventory-Based Businesses in Botswana
+A baker buys flour, butter, and packaging for BWP 2,000 every Monday. By Friday she has sold everything for
+BWP 2,800. She made BWP 800 profit. But if she only has BWP 800 in her account on Monday she can only
+buy BWP 800 of ingredients , which means she can only bake and sell BWP 1,120 worth of goods. Her 
+business is not failing. It is constrained by the cash available at the start of each cycle. Duela Tech gives her 
+the BWP 2,000 she needs to operate at full capacity.This document defines the Duela Tech MVP business model — specifically how working capital financing 
+works, which businesses qualify, how funds are disbursed and protected, and how repayments are collected. It
+is the definitive operational reference for the first phase of the platform.
+1. WHAT IS WORKING CAPITAL FINANCING
+1.1 Explanation
+Working capital is the money a business needs to operate before its revenue comes in. Most retail and 
+inventory businesses face a timing gap — they have to spend money buying stock before they can earn money
+selling it. This gap is what Duela Cred finances.
+1.2 Why This Works as a Financing Product
+The money is tied to a specific, verifiable purpose — buying stock. Not a vague business goal.
+The repayment comes from a real, existing revenue stream — the business is already selling and already
+generating cash
+
+
+--- PAGE 2 ---
+The following five business categories are approved for the MVP phase. Each category has its own profile,
+vetting approach, and disbursement method.DuelaCred finances retail and inventory-based businesses in Botswana that meet three criteria: they are
+already generating consistent revenue, they have a specific and verifiable stock-buying need, and they have
+the repayment capacity to service the campaign comfortably from additional revenue generated.The cash cycle is short — stock is bought, sold, and revenue collected within days to weeks, not months
+The risk is not whether the business can generate revenue — it already is. The question is whether the
+working capital unlocks enough additional revenue to cover the repayment comfortably
+2.1 Overview
+2.2 Bakers and Home Bakers1.3 The Core Question Before Approving Any Campaign
+Will the additional capital unlock enough additional revenue to cover the monthly repayment comfortably —
+while still leaving the business owner with meaningful profit? If the answer is clearly yes, the campaign is
+fundable. If the answer is uncertain or depends on optimistic assumptions, it is not.
+Business Profile Financing Details
+Home bakers, small bakery operations, catering bakers
+supplying events, offices, and schools
+Buying: flour, butter, eggs, sugar, yeast, packaging, baking
+supplies
+Revenue cycle: 1–7 days from ingredient purchase to sale
+Orders are often confirmed before buying ingredients —
+low inventory riskRepayment period: 3–6 months
+Return multiple: 1.15x – 1.20x
+First campaign cap: BWP 5,000Campaign range: BWP 1,500 – BWP 5,000
+What makes a baker fundable:
+
+--- PAGE 3 ---
+Has confirmed upcoming events or standing contracts — not purely speculative future bookings
+Can show event booking deposits or letters of engagement as evidence of confirmed revenue
+Operates consistently — not only during peak seasons like December and Easter
+Can demonstrate past event revenue through mobile money receipts or client payment recordsConfirmed regular orders — school contracts, office supply agreements, event bookings — provide
+predictable revenue
+Can clearly state weekly ingredient cost and weekly sales revenue
+Has been operating for at least 6 months with identifiable repeat customers
+Mobile money shows regular small inflows consistent with daily or weekly sales
+Where possible: direct payment to identified ingredient supplier (Cash and Carry, specific wholesaler)
+Otherwise: transfer to business mobile money with proof of purchase required within 72 hours
+Ideal: direct payment to identified food supplier or Cash and Carry account
+Proof of purchase required within 72 hours of each disbursementDisbursement approach:
+Disbursement approach:What makes a caterer fundable:2.3 Catering Businesses
+Business Profile Financing Details
+Event caterers, office lunch caterers, funeral caterers,
+wedding caterers, school tuck shops run by caterers
+Buying: food ingredients, cooking supplies, disposable
+containers, serving equipment
+Revenue cycle: payment often received at event or within
+7–14 days
+Often have confirmed bookings — lower demand risk than
+pure retailRepayment period: 3–6 months
+Return multiple: 1.15x – 1.20x
+First campaign cap: BWP 8,000Campaign range: BWP 3,000 – BWP 20,000
+
+--- PAGE 4 ---
+2.4 Vetted E-Commerce Businesses
+Business Profile Financing Details
+Online retailers selling through WhatsApp, Facebook,
+Instagram, or local e-commerce platforms — clothing, tech
+accessories, homeware, beauty products
+Buying: clothing stock, tech accessories, phone cases,
+beauty products, homeware
+Revenue cycle: 1–30 days depending on platform and
+delivery
+Must have verifiable social media presence and order
+history as proof of tradingRepayment period: 3–6 months
+Return multiple: 1.20x – 1.25x (slightly higher — less
+physical verifiability)
+First campaign cap: BWP 5,000Campaign range: BWP 2,000 – BWP 15,000
+Disbursement approach:What makes an e-commerce business fundable:
+Direct payment to identified supplier where supplier has a verifiable mobile money or bank account
+Screenshots of supplier invoice and proof of stock received required within 72 hours
+Social media post showing new stock arrival accepted as additional proof of purchaseActive social media presence with visible sales activity — comments, DMs, customer reviews, sold-out
+posts
+Can show at least 3 months of consistent order history through WhatsApp chats, DM logs, or order 
+screenshots
+Has an identified supplier — a specific clothing wholesaler, tech accessories importer, or beauty 
+distributor
+Mobile money shows inflows consistent with regular sales activity
+Has at least one physical aspect — pickup location, storage space — that can be photographed
+E-commerce requires slightly more scrutiny than physical retail because the business is harder to physically
+verify. The social media trail and order history are the equivalent of the physical shop photos for a brick-and-
+mortar business. If an e-commerce applicant cannot show consistent, real customer interactions their 
+application is declined.
+
+--- PAGE 5 ---
+2.6 General Retail Shops and Tuck Shops2.5 Nail Technicians and Beauty Practitioners
+Business Profile Financing Details
+Nail technicians, lash technicians, braiders, and beauty
+practitioners who sell products alongside services — nail
+polish, gels, tips, lash sets, hair products
+Buying: nail supplies, gel kits, lash inventory, hair products
+for resale
+Revenue cycle: daily service income plus product salesRepayment period: 3–6 months
+Return multiple: 1.15x – 1.20x
+First campaign cap: BWP 4,000
+Note: financing covers product stock only — not service
+equipmentCampaign range: BWP 1,500 – BWP 10,000
+Important limitation:Disbursement approach:What makes a nail tech fundable:
+Direct payment to beauty supply wholesaler where the supplier has a verifiable account
+Proof of stock received — photos of new product inventory — required within 72 hours
+Product receipt or supplier invoice required as supporting documentationHas a fixed working location — home salon, rented chair, or own premises — that can be photographed
+Has a client book or appointment system showing regular bookings
+Social media shows active service promotion and client work photos with regular posting activity
+Can identify the specific product supplier they buy from and the exact products they intend to purchase
+Mobile money shows consistent inflows matching a service-based income pattern
+DuelaCred does not finance service equipment such as nail lamps, drill machines, or salon furniture at MVP
+stage. Financing covers inventory only — products that are sold on or consumed in service delivery. Equipment
+financing is a different product with different repayment logic and will be considered in Version 2.
+
+--- PAGE 6 ---
+Business Profile Financing Details
+General dealers, tuck shops, spaza-style stores, small
+superettes selling fast-moving consumer goods —
+groceries, airtime, cold drinks, household items
+Buying: groceries, FMCG goods, airtime stock, cold drinks,
+cleaning products
+Revenue cycle: 1–7 days — high-turnover daily sales
+Easiest business type to verify — physical stock, fixed
+location, daily footfallRepayment period: 3–6 months
+Return multiple: 1.15x
+First campaign cap: BWP 5,000Campaign range: BWP 1,000 – BWP 5,000
+Disbursement approach:Why general retail is the anchor business type:
+Easiest to verify — physical shop, visible stock, identifiable location
+Highest frequency of transactions — daily sales create predictable cash flow for repayment
+Simplest use of funds — stock buying from Cash and Carry or identified distributor
+Direct supplier payment is most achievable with this business type
+Lowest investor risk in the DuelaCred portfolio — recommended for conservative investor risk band
+Primary: direct payment to Cash and Carry or named distributor
+Secondary: transfer to business mobile money with Cash and Carry receipt required within 72 hours
+Stock photo at shop premises required as confirmation of delivery
+Every SME application goes through a five-stage vetting process before approval. The process is proportional to
+the campaign size — a BWP 5,000 first campaign requires less documentation than a BWP 25,000 repeat
+campaign. 3. THE VETTING PROCESS
+3.1 Overview
+
+--- PAGE 7 ---
+Stage What Is Checked How It Is Verified Time Required
+1. Identity
+2. Business
+registration
+3. Physical
+verification
+4. Financial
+assessment
+5. MLRO approvalCIPA registration lookup
+Full application review, risk
+scoring, campaign terms setOmang or passport of business
+owner
+Business premises, stock, owner
+photo
+Mobile money history, self-
+reported revenue, declared costsThree months of mobile money
+statements + structured financial
+questionnaireThree photos uploaded: business
+front, interior with stock, owner at
+premises 
+Manual review by DuelaCred MLRO
+— approve, decline, or request
+additional informationCIPA search — confirms business is
+legally registeredDocument upload — name, photo, ID    5 minutes
+number checked
+5 minutes
+10 minutes
+20 minutes
+24–48 hours
+3.2 The Five Application Questions
+Every applicant answers these five questions as part of Stage 4. The specificity of their answers is as important
+as the numbers:
+
+--- PAGE 8 ---
+Question What It Reveals Red Flag Answer
+What exactly will you use this
+funding for?How long has your business been
+operating?
+What are your average weekly or
+monthly sales in BWP?
+How will this generate the revenue
+to repay us monthly?What are your main monthly costs?Real profitability and surplus 
+available for repaymentTrading maturity and stability
+Revenue baseline for repayment
+capacity assessment
+Specificity of purpose — key fraud
+prevention question
+Repayment logic — does the math
+work?Less than 6 months — decline unless
+exceptional circumstances
+"I don't really know" — no financial
+awareness is a serious vetting concern
+Cannot articulate a clear link between the
+capital and additional revenueCannot give a specific number — business
+owner does not track their own sales
+"To grow my business" or any vague answer
+— not fundable
+3.3 Risk Scoring
+
+--- PAGE 9 ---
+Factor Low Risk (Score 1) Medium Risk (Score 2)High Risk (Score 3)
+Trading history
+Revenue clarity
+Purpose of funding
+Physical verifiability
+Repayment capacityMobile money activity 50+ transactions per
+month, consistent
+amounts
+Fixed premises, visible
+stock, clear locationOver 2 years operating
+Specific weekly/monthly
+figures stated and
+plausible
+Declared surplus clearly
+exceeds monthly
+repaymentHome-based but
+photographable1–2 years operating
+Approximate figures —
+somewhat plausible
+Surplus approximately
+matches repaymentSpecific supplier, specific General stock category 
+stock, specific amount — supplier not named20–50 transactions per
+monthUnder 1 year operating
+Under 20 or very irregular
+Vague — "to grow" or "to buy
+things"Vague or implausible revenue
+claims
+Surplus below or unclear relative to
+repaymentDigital only — no physical presence
+Total score 6–8: Low risk — return multiple 1.15x — eligible for conservative investor band
+Total score 9–13: Medium risk — return multiple 1.20x — eligible for balanced investor band
+Total score 14–18: High risk — return multiple 1.25x — eligible for growth investor band only — MLRO
+personal approval required
+DuelaCred uses three complementary controls to ensure disbursed funds are used for their stated purpose. 
+No single control is foolproof — together they make misuse very difficult, immediately visible, and costly for the 4. HOW WE MAKE SURE FUNDS ARE USED CORRECTLY
+4.1 The Three-Layer Fund Control System
+SME.
+
+--- PAGE 10 ---
+Required documentation within 72 hours of disbursement:
+Photo of receipt or invoice from supplier
+Photo of stock physically received and stored at business premises
+For e-commerce: screenshot of supplier order confirmation plus delivery tracking
+SMEs consent to post-disbursement transaction monitoring as part of the campaign agreement
+What Duela Tech looks for in the 4 weeks after disbursement:
+  
+Duela Tech reviews submitted evidence within 24 hours of receipt
+If evidence is not submitted within 72 hours: funds are flagged as potentially misused, MLRO notified,
+SME contacted for explanation
+If evidence is inadequate or suspicious: campaign placed under formal review, investors notified, legal 
+recovery consideredAt application the SME declares their primary supplier name, mobile money number or bank account, and
+the specific goods to be purchased
+Upon campaign funding Duela Tech contacts the supplier independently to verify the account details
+Payment is made directly to the supplier with a payment reference that includes the SME name and 
+campaign number
+The supplier confirms delivery to Duela Tech within 48 hours of payment
+This approach is used for all bakers, caterers, general retailers, and nail techs with identifiable formal 
+suppliersLayer 1 — Direct Supplier Payment (Primary Control)
+Layer 3 — Post-Disbursement Transaction MonitoringLayer 2 — Proof of Purchase Within 72 Hours (Secondary Control)
+Where direct supplier payment is not possible, the SME must submit proof of purchase within 72 hours of
+receiving funds. Failure to submit triggers an immediate formal review.Where possible, Duela Tech pays the supplier directly — not the SME. The SME receives stock, not cash.
+There is nothing to misuse because no cash changes hands.
+After disbursement, Duela Tech monitors the SME's mobile money transaction patterns for 4 weeks. A
+business that spent its capital on stock shows increased transaction activity. A business that misused funds
+does not.
+Increased transaction frequency — more sales means more mobile money inflowsFor nail techand beauty: photo of new product inventory at salon orworkinglocation
+
+--- PAGE 11 ---
+Platform banMisuse detected
+Investor notification
+Legal documentationNon-payment of demandMLRO notified — SME contacted immediately for
+explanation
+Civil recovery initiated — local attorney engaged for
+amounts above BWP 5,000
+All evidence of misuse — application declarations,
+disbursement records, purchase evidence failure —
+compiled for legal proceedingsSME permanently removed from platform regardless of
+recovery outcomeInvestors informed of misuse and recovery status — full
+transparency throughoutTransaction amounts consistent with restocked business operating at higher capacity
+Supplier payment visible in outgoing transactions if not paid directly
+ 
+Day 15 after demandNo satisfactory explanationFormal demand letter issued — full outstanding balance Within 5 business days
+due immediately
+Ongoing from detectionWithin 24 hours of formal
+demandWithin 24 hours of detection
+Immediately upon confirmed
+misuseRed flag: transactionpatternafterdisbursement identicalto pattern before— no evidence of additional
+activity
+Red flag: large transfers to personal accounts or unrelated parties immediately after disbursement
+Any red flag triggers an MLRO review within 48 hours — not an automatic default declaration but a 
+mandatory investigation
+5.1 How It Works4.2 What Happens if Misuse is Confirmed
+Stage Action Timeframe
+5. THE GRADUATED LIMIT MODEL
+
+--- PAGE 12 ---
+Every SME on DuelaCred starts at a capped first-campaign limit regardless of how large their stated need is.
+Access to larger campaigns is earned through demonstrated repayment performance — not granted upfront
+based on promises.
+The graduated limit system is communicated to every SME at the point of application — not as a restriction but
+as a pathway. The graduated limit model serves two purposes simultaneously. It protects investors by limiting exposure to
+unproven SMEs. And it creates the most powerful repayment incentive available — the SME has a direct
+commercial reason to repay on time because doing so unlocks more capital for their next campaign.
+Campaign Maximum Limit Eligibility Requirement Return Multiple Range
+First campaign
+Third campaign
+Fourth campaign
+and beyondSecond campaign BWP 8,000
+BWP 15,000
+BWP 30,000BWP 1,000–5,000
+(varies by business type)
+First campaign repaid in full — zero
+missed payments
+Three or more campaigns with clean
+repayment recordPassed full vetting process — no prior
+track record required
+Two campaigns repaid in full — consistent
+on-time payments1.15x – 1.20x
+1.15x – 1.20x
+1.10x – 1.15x — returning
+SMEs are the safest
+investment on the platform1.10x – 1.20x (lower risk =
+lower return)
+5.2 Communication to SMEs
+
+--- PAGE 13 ---
+6.1 The Repayment Structure5.3 Why This Is Better Than Collateral
+Collateral requires the SME to already own assets — excluding exactly the businesses that need help
+most
+The repayment track record is a better predictor of future repayment behaviour than any asset valuation
+It creates a loyalty dynamic — returning SMEs are more valuable to the platform than new ones because 
+their risk is known
+It generates the proprietary credit data that becomes Duela Tech's competitive moat over time — each
+completed cycle adds to a dataset no competitor can replicate without years of operation
+6. HOW REPAYMENTS WORK
+
+--- PAGE 14 ---
+Element Detail
+Early repaymentPartial repaymentDistribution timingRepayment period
+Repayment methodRepayment amountRepayment frequency
+Late repayment toleranceMonthly — first repayment due 30 days after disbursement date3 or 6 months — set at campaign approval based on business type and
+campaign size
+Distributed proportionally to investors — even partial amounts distributed
+promptly rather than heldEqual monthly instalments — total repayment amount divided by number of
+months
+SME transfers to Duela Tech ring-fenced account via Orange Money, Mascom
+MyZaka, or bank transfer
+Permitted at any time — investors receive outstanding balance proportionally
+— no penalty for SMEInvestors receive their proportional share within 48 hours of each repayment
+received
+7 days grace period — MLRO outreach on Day 8 — BWP 150 late fee applied
+on Day 15
+6.2 Example Repayment Calculation
+
+--- PAGE 15 ---
+Scenario General Dealer — 6-Month Campaign
+SME receives
+Return multiplePlatform fee (5%)Campaign amount
+Total investor repayment
+Duela Tech total revenueMonthly repayment by SME
+Investor A (invested BWP 3,000)
+Investor B (invested BWP 5,000)
+Investor C (invested BWP 2,000)1.20xBWP 9,500BWP 10,000
+BWP 12,000 (BWP 10,000 × 1.20x)
+BWP 2,000 per month for 6 monthsBWP 500 — deducted at disbursement
+Receives BWP 600 per month — BWP 3,600 total
+Receives BWP 400 per month — BWP 2,400 totalReceives BWP 1,000 per month — BWP 6,000 total
+BWP 500 origination fee + BWP 0 (clean repayment — no late fees)
+7. THE INVESTOR EXPERIENCE
+7.1 Auto-Invest — No Admin Required
+Most investors do not want to browse individual campaigns and make active investment decisions.
+DuelaCred auto-invest feature allows investors to set their preferences once at onboarding and let the
+platform deploy their capital automatically.
+
+--- PAGE 16 ---
+Investor Risk Band Campaigns Eligible Return Multiple Typical Business Types
+Growth(Khumo)Balanced(Kgolo)Conservative(Peo)
+All approved campaigns
+including risk score 14–18Risk score 6–13 — mix of low
+and medium riskRisk score 6–8 only — lowest
+risk campaigns1.15x
+1.15x – 1.20x
+1.15x – 1.25xGeneral retail shops, established
+bakers with school contracts,
+returning SMEs on third+ campaign
+Full range including first-time e-
+commerce and nail tech businessesMix of retail, catering, and established
+e-commerce businesses
+7.2 The Investor Wallet
+7.3 What Investors See on Their DashboardAll repayments received are deposited into the investor's in-platform wallet
+The wallet balance is automatically reinvested into the next available campaign matching their risk band
+Investors can withdraw their wallet balance at any time — minimum withdrawal BWP 100
+Investors receive a notification every time a repayment arrives in their wallet
+Monthly dashboard summary shows total invested, total returned, active campaigns, and expected next 
+repayment
+
+--- PAGE 17 ---
+Dashboard Element What It Shows
+Campaign status
+Risk band settingActive campaignsPortfolio summary
+Repayment history
+Upcoming paymentsActive / Repaying / Late (flagged in amber) / Defaulted (flagged in red) /
+CompletedTotal deployed, total returned to date, total expected return, wallet balance
+Current band — Conservative / Balanced / Growth — with option to changeEach campaign with business name, amount invested, repayment progress
+bar, next payment date
+List of expected repayment dates and amounts across all active campaignsFull log of every payment received with date, amount, and source campaign
+8. WHAT DUELA TECH DOES NOT FINANCE AT MVP STAGE
+These exclusions are not permanent — they reflect what is appropriate for the first phase of the platform
+before a repayment track record has been established.
+
+--- PAGE 18 ---
+Excluded Category Reason Future Consideration
+Invoice discounting
+Agricultural businessesPublic transport operators
+Payroll and personal loans
+Construction and contractingStartups with under 6 months
+tradingService equipment and capital
+assets
+No revenue history to verify repayment
+capacity — too early to assess
+Event-driven not cyclical capital need —
+breakdown financing requires different
+product structure
+Project-based payment cycles are
+unpredictable — high default risk at MVP
+stage
+Businesses with vague funding Cannot structure appropriate fund controls 
+purpose without specific use of funds statedRequires verification of third-party debtor
+creditworthiness — more complex product
+Long seasonal cash cycles create extended
+repayment periods beyond 6 monthsDifferent regulatory treatment — consumer
+credit licence required — different risk profileDifferent repayment logic — equipment does
+not generate immediate incremental revenue;
+longer payback period
+Version 2 — seasonal financing
+product with harvest-aligned
+repayment
+Never — specificity of purpose is a
+permanent eligibility requirementVersion 2 — 30-60 day emergency
+maintenance facility
+Version 3 — only after sophisticated
+credit scoring model developedConsider after 12 months of platform
+operation with proven vetting modelVersion 2 — equipment financing with
+longer repayment terms
+Version 3 — pending regulatory clarity
+and licenceVersion 2 — priority next product after
+working capital proven
+9. DOCUMENT CONTROL
+
+--- PAGE 19 ---
+Investors ui
+
+--- PAGE 20 ---
+(no extractable text)
+
+--- PAGE 21 ---
+(no extractable text)
+
