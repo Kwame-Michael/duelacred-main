@@ -8,7 +8,7 @@ import Disclaimer from "@/components/onboarding/Disclaimer";
 import SuccessScreen from "@/components/onboarding/SuccessScreen";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { createRecord, uploadFile, getPublicFileUrl, STORAGE_BUCKET } from "@/lib/supabase";
+import { createRecord, uploadFile, getSignedStorageUrl, STORAGE_BUCKET } from "@/lib/supabase";
 import { toast } from "sonner";
 
 const CATEGORIES = [
@@ -68,10 +68,10 @@ const SmeOnboarding = () => {
           await uploadFile(STORAGE_BUCKET, statementPath, statement, { cacheControl: 3600, upsert: true });
         }
 
-        const premisesUrl = docs.premises ? getPublicFileUrl(STORAGE_BUCKET, premisesPath) : "";
-        const stockUrl = docs.stock ? getPublicFileUrl(STORAGE_BUCKET, stockPath) : "";
-        const selfieUrl = docs.selfie ? getPublicFileUrl(STORAGE_BUCKET, selfiePath) : "";
-        const statementUrl = statement ? getPublicFileUrl(STORAGE_BUCKET, statementPath) : "";
+        const premisesUrl = docs.premises ? await getSignedStorageUrl(STORAGE_BUCKET, premisesPath) : "";
+        const stockUrl = docs.stock ? await getSignedStorageUrl(STORAGE_BUCKET, stockPath) : "";
+        const selfieUrl = docs.selfie ? await getSignedStorageUrl(STORAGE_BUCKET, selfiePath) : "";
+        const statementUrl = statement ? await getSignedStorageUrl(STORAGE_BUCKET, statementPath) : "";
 
         await createRecord("SME_Applications", {
           "Business Name": biz.name,

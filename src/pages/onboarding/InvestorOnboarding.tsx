@@ -9,7 +9,7 @@ import Disclaimer from "@/components/onboarding/Disclaimer";
 import SuccessScreen from "@/components/onboarding/SuccessScreen";
 import { Sprout, TreeDeciduous, Flame, ArrowLeft, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { createRecord, uploadFile, getPublicFileUrl, STORAGE_BUCKET } from "@/lib/supabase";
+import { createRecord, uploadFile, getSignedStorageUrl, STORAGE_BUCKET } from "@/lib/supabase";
 import { toast } from "sonner";
 
 type Band = "Peo" | "Kgolo" | "Khumo";
@@ -118,7 +118,7 @@ const InvestorOnboarding = () => {
       try {
         const proofPath = `investor-onboarding/${personal.email}/${Date.now()}-${file.name}`;
         await uploadFile(STORAGE_BUCKET, proofPath, file, { cacheControl: 3600, upsert: true });
-        const proofUrl = getPublicFileUrl(STORAGE_BUCKET, proofPath);
+        const proofUrl = await getSignedStorageUrl(STORAGE_BUCKET, proofPath);
         await createRecord("Investor_Onboarding", {
           "Full Name": personal.fullName,
           Email: personal.email,

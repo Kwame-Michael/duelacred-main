@@ -2,7 +2,7 @@ import { createClient, type PostgrestFilterBuilder } from "@supabase/supabase-js
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const SUPABASE_STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "uploads";
+const SUPABASE_STORAGE_BUCKET = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "private-docs";
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   throw new Error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment");
@@ -10,6 +10,7 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export const STORAGE_BUCKET = SUPABASE_STORAGE_BUCKET;
+export { SUPABASE_URL, SUPABASE_ANON_KEY };
 
 export interface AirtableRecord<T = Record<string, unknown>> {
   id: string;
@@ -22,6 +23,18 @@ interface SupabaseRow<T = Record<string, unknown>> {
   fields: T;
   created_at: string;
 }
+
+const TABLE_NAME_MAP: Record<string, string> = {
+  Users: "users",
+  SME_Applications: "sme_applications",
+  Listings: "listings",
+  Investments: "investments",
+  Repayments: "repayments",
+  Repayment_Proofs: "repayment_proofs",
+  Investor_Onboarding: "investor_onboarding",
+};
+
+const normalizeTableName = (table: string) => TABLE_NAME_MAP[table] || table.toLowerCase();
 
 const applyJsonFilters = <T>(query: PostgrestFilterBuilder<SupabaseRow<T>>, filter: Record<string, unknown>) => {
   for (const [key, value] of Object.entries(filter)) {
@@ -46,7 +59,8 @@ export async function fetchRecords<T = Record<string, unknown>>(
   table: string,
   filter?: Record<string, unknown> | string
 ): Promise<AirtableRecord<T>[]> {
-  let query = supabase.from<SupabaseRow<T>>(table).select("id, fields, created_at");
+  const tableName = normalizeTableName(table);
+  let query = supabase.from<SupabaseRow<T>>(tableName).select("id, fields, created_at");
   const normalizedFilter = normalizeFilter(filter);
   if (normalizedFilter) {
     query = applyJsonFilters(query, normalizedFilter);
@@ -62,8 +76,9 @@ export async function fetchRecord<T = Record<string, unknown>>(
   table: string,
   recordId: string
 ): Promise<AirtableRecord<T>> {
+  const tableName = normalizeTableName(table);
   const { data, error } = await supabase
-    .from<SupabaseRow<T>>(table)
+    .from<SupabaseRow<T>>(tableName)
     .select("id, fields, created_at")
     .eq("id", recordId)
     .single();
@@ -73,13 +88,28 @@ export async function fetchRecord<T = Record<string, unknown>>(
   return { id: data.id, fields: data.fields as T, createdTime: data.created_at };
 }
 
+async function getCurrentAuthId(): Promise<string | null> {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user?.id) {
+    return null;
+  }
+  return user.id;
+}
+
 export async function createRecord<T = Record<string, unknown>>(
   table: string,
   fields: Partial<T>
 ): Promise<AirtableRecord<T>> {
+  const tableName = normalizeTableName(table);
+  const authId = await getCurrentAuthId();
+  const payload: Record<string, unknown> = { fields };
+  if (authId) {
+    payload.auth_id = authId;
+  }
+
   const { data, error } = await supabase
-    .from<SupabaseRow<T>>(table)
-    .insert([{ fields }])
+    .from<SupabaseRow<T>>(tableName)
+    .insert([payload])
     .select("id, fields, created_at")
     .single();
   if (error) {
@@ -93,11 +123,18 @@ export async function updateRecord<T = Record<string, unknown>>(
   recordId: string,
   fields: Partial<T>
 ): Promise<AirtableRecord<T>> {
+  const tableName = normalizeTableName(table);
   const existing = await fetchRecord<T>(table, recordId);
   const merged = { ...existing.fields, ...fields };
+  const authId = await getCurrentAuthId();
+  const payload: Record<string, unknown> = { fields: merged };
+  if (authId) {
+    payload.auth_id = authId;
+  }
+
   const { data, error } = await supabase
-    .from<SupabaseRow<T>>(table)
-    .update({ fields: merged })
+    .from<SupabaseRow<T>>(tableName)
+    .update(payload)
     .eq("id", recordId)
     .select("id, fields, created_at")
     .single();
@@ -108,8 +145,9 @@ export async function updateRecord<T = Record<string, unknown>>(
 }
 
 export async function deleteRecord(table: string, recordId: string): Promise<void> {
+  const tableName = normalizeTableName(table);
   const { error } = await supabase
-    .from(table)
+    .from(tableName)
     .delete()
     .eq("id", recordId);
   if (error) {
@@ -123,11 +161,55 @@ export async function uploadFile(
   file: File | Blob,
   options?: { cacheControl?: number; upsert?: boolean }
 ) {
-  const { data, error } = await supabase.storage.from(bucket).upload(path, file, options);
-  if (error) {
-    throw error;
+  const primaryBucket = bucket || STORAGE_BUCKET;
+
+  const fileArrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(fileArrayBuffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.byteLength; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, Array.from(chunk));
   }
-  return data;
+  const fileBase64 = btoa(binary);
+  const contentType = file instanceof File ? file.type || "application/octet-stream" : "application/octet-stream";
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/uploadFile`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      apikey: SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({ bucket: primaryBucket, path, fileBase64, contentType, upsert: options?.upsert ?? true }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Upload request failed: ${response.status} ${text}`);
+  }
+
+  const data = await response.json();
+  return data.data;
+}
+
+export async function getSignedStorageUrl(bucket: string, path: string, expires = 60) {
+  const url = `${SUPABASE_URL}/functions/v1/getSignedUrl`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      apikey: SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({ bucket, path, expires }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Signed URL request failed: ${response.status} ${text}`);
+  }
+
+  const data = await response.json();
+  return data.signedUrl || data.url || data?.data?.signedUrl || data?.data?.url;
 }
 
 export function getPublicFileUrl(bucket: string, path: string) {
@@ -136,6 +218,26 @@ export function getPublicFileUrl(bucket: string, path: string) {
     throw error;
   }
   return data.publicUrl;
+}
+
+export async function backfillAuthOwnershipForCurrentUser(email: string, tables = ["Users", "SME_Applications", "Investor_Onboarding", "Repayments", "Repayment_Proofs"]) {
+  const authId = await getCurrentAuthId();
+  if (!authId || !email) {
+    return;
+  }
+
+  const normalizedEmail = email.toLowerCase();
+  for (const table of tables) {
+    const tableName = normalizeTableName(table);
+    const fieldName = table === "Users" ? "Email" : table === "SME_Applications" ? "Submitted By Email" : table === "Investor_Onboarding" ? "Email" : "Email";
+    const { data, error } = await supabase.from(tableName).select("id").eq(`fields->>${fieldName}`, normalizedEmail);
+    if (error) {
+      continue;
+    }
+    for (const row of data || []) {
+      await supabase.from(tableName).update({ auth_id: authId }).eq("id", row.id);
+    }
+  }
 }
 
 export async function autoInvest(listingId: string, perInvestorAmount = 10) {
@@ -174,4 +276,31 @@ export async function autoInvest(listingId: string, perInvestorAmount = 10) {
     remaining = Math.max(0, fundingGoal - current);
   }
   return { listingId, remaining };
-}
+};
+
+/**
+ * Send OTP email via Resend Edge Function
+ * Used as fallback/supplement to Supabase Auth email sending
+ */
+export const sendOtpEmail = async (email: string, otp: string): Promise<{ success: boolean; id?: string; error?: string }> => {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/sendOtp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ email, otp }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error("Failed to send OTP email:", data);
+      return { success: false, error: data.error || "Failed to send email" };
+    }
+    return { success: true, id: data.id };
+  } catch (error) {
+    console.error("Error sending OTP email:", error);
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+  }
+};

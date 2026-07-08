@@ -35,6 +35,7 @@ const App = () => (
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/opportunity/:id" element={<Opportunity />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/callback" element={<Auth />} />
                 <Route path="/signup" element={<Welcome />} />
                 <Route path="/onboarding" element={<Welcome />} />
                 <Route path="/onboarding/investor" element={<InvestorOnboarding />} />

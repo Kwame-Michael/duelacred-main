@@ -15,18 +15,19 @@ const Auth = () => {
   const [role, setRole] = useState<"investor" | "sme">(defaultRole as "investor" | "sme");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-  const { user, login } = useAuth();
+  const [otp, setOtp] = useState("");
+  const { user, login, verifyOtp } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (window.location.search.includes("access_token") || window.location.search.includes("refresh_token")) {
       (async () => {
-        const { data, error } = await supabase.auth.getSessionFromUrl();
+        const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
           toast.error("Unable to complete sign in.");
           return;
         }
-        if (data?.session?.user) {
+        if (session?.user) {
           toast.success("Signed in successfully!");
           navigate(searchParams.get("role") === "sme" ? "/dashboard/sme" : "/dashboard/investor");
         }
@@ -48,11 +49,31 @@ const Auth = () => {
     }
     setLoading(true);
     try {
-      await login(name.trim(), email.trim().toLowerCase(), role);
+      await login(name.trim(), email.trim(), role);
       setSent(true);
-      toast.success("Check your email for the login link.");
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.success("We sent a 6-digit code to your email.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp.trim()) {
+      toast.error("Please enter the 6-digit code");
+      return;
+    }
+    setLoading(true);
+    try {
+      await verifyOtp(email.trim(), otp.trim());
+      toast.success("Signed in successfully!");
+      navigate(role === "sme" ? "/dashboard/sme" : "/dashboard/investor");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to verify your code.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -68,11 +89,15 @@ const Auth = () => {
         </div>
 
         {sent ? (
-          <div className="bg-card rounded-xl border border-border p-6 shadow-sm text-center">
-            <h2 className="text-xl font-bold text-foreground">Email link sent</h2>
-            <p className="text-muted-foreground mt-3">Check your inbox and click the magic link to complete sign in.</p>
-            <p className="text-sm text-muted-foreground mt-4">If you don't see it, check spam or try again.</p>
-          </div>
+          <form onSubmit={handleVerify} className="bg-card rounded-xl border border-border p-6 space-y-4 shadow-sm text-center">
+            <h2 className="text-xl font-bold text-foreground">Enter your code</h2>
+            <p className="text-muted-foreground mt-3">We sent a 6-digit code to {email}.</p>
+            <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="123456" maxLength={6} className="text-center tracking-[0.35em]" />
+            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+              {loading ? "Verifying…" : "Verify code"}
+            </Button>
+            <p className="text-sm text-muted-foreground">If you don't see it, check spam or wait a minute before requesting another code.</p>
+          </form>
         ) : (
           <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-border p-6 space-y-4 shadow-sm">
             <div>
