@@ -37,6 +37,9 @@ const Navbar = () => {
           {user && dashboardPath && (
             <Link to={dashboardPath} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Dashboard</Link>
           )}
+          {user?.role === "admin" && (
+            <Link to="/dashboard/admin" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Admin</Link>
+          )}
           {user ? (
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground">Hi, {user.name.split(" ")[0]}</span>
@@ -64,6 +67,9 @@ const Navbar = () => {
           <Link to="/marketplace" className="block text-sm font-medium" onClick={() => setOpen(false)}>Marketplace</Link>
           {user && dashboardPath && (
             <Link to={dashboardPath} className="block text-sm font-medium" onClick={() => setOpen(false)}>Dashboard</Link>
+          )}
+          {user?.role === "admin" && (
+            <Link to="/dashboard/admin" className="block text-sm font-medium" onClick={() => setOpen(false)}>Admin</Link>
           )}
           {user ? (
             <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => { handleLogout(); setOpen(false); }}>

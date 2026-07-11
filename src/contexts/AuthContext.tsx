@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase, fetchRecords, createRecord, backfillAuthOwnershipForCurrentUser, SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 import { clearPendingOtp, generateOtpCode, getPendingOtp, getAuthRedirectUrl, isAuthCallbackPath, OTP_EXPIRY_MS, storePendingOtp } from "@/lib/auth";
+import { shouldRequireOtp } from "@/lib/onboarding";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface User {
@@ -14,7 +15,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (name: string, email: string, role: "investor" | "sme" | "admin") => Promise<void>;
+  login: (name: string, email: string, role: "investor" | "sme" | "admin") => Promise<boolean>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -22,7 +23,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => {},
+  login: async () => false,
   verifyOtp: async () => {},
   logout: async () => {},
 });
@@ -159,12 +160,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Please enter a valid email address.");
     }
 
+    const existingAccount = await shouldRequireOtp(normalizedEmail);
+    if (!existingAccount) {
+      const records = await fetchRecords("Users", `{Email} = '${normalizedEmail}'`);
+      if (records.length > 0) {
+        const profileRecord = records[0];
+        const profileRole = ((profileRecord.fields as Record<string, unknown>)["Role"] as string || role).toLowerCase() as "investor" | "sme" | "admin";
+        const profileName = ((profileRecord.fields as Record<string, unknown>)["Name"] as string) || normalizedEmail;
+        const walletBal = Number((profileRecord.fields as Record<string, unknown>)["Wallet Balance"] || 0);
+        clearPendingOtp();
+        clearPendingProfile();
+        setCurrentUser({
+          email: normalizedEmail,
+          name: profileName,
+          role: profileRole,
+          recordId: profileRecord.id,
+          wallet: isNaN(walletBal) ? 0 : walletBal,
+        });
+        return false;
+      }
+    }
+
     const lastSent = Number(localStorage.getItem(OTP_THROTTLE_KEY) || "0");
     if (Date.now() - lastSent < OTP_THROTTLE_MS) {
       throw new Error("A sign-in code was already sent recently. Please wait a minute and try again.");
     }
 
-    localStorage.setItem(PENDING_PROFILE_KEY, JSON.stringify({ name, email: normalizedEmail, role }));
+    localStorage.setItem(
+      PENDING_PROFILE_KEY,
+      JSON.stringify({
+        name,
+        email: normalizedEmail,
+        role,
+      }),
+    );
 
     const otp = generateOtpCode();
     const expiresAt = Date.now() + OTP_EXPIRY_MS;
@@ -176,6 +205,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({ email: normalizedEmail, otp }),
@@ -186,8 +216,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         clearPendingOtp();
         throw new Error(data.error || "Unable to send sign-in code. Please try again.");
       }
+
+      if (data?.otp) {
+        console.info(`[OTP] ${data.otp}`);
+      }
+
+      return true;
     } catch (error) {
       clearPendingOtp();
+      clearPendingProfile();
+      setCurrentUser(null);
       const message = error instanceof Error ? error.message : "Unable to send sign-in code. Please try again.";
       throw new Error(message);
     }

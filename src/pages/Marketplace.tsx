@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchRecords, type AirtableRecord } from "@/lib/supabase";
+import { fetchRecords, type RecordItem } from "@/lib/supabase";
+import { subscribeToDataRefresh } from "@/lib/refresh";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +47,7 @@ const ELIGIBLE_CATEGORIES_BY_BAND: Record<string, string[]> = {
 
 const Marketplace = () => {
   const { user } = useAuth();
-  const [listings, setListings] = useState<AirtableRecord<ListingFields>[]>([]);
+  const [listings, setListings] = useState<RecordItem<ListingFields>[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
 
@@ -54,11 +55,21 @@ const Marketplace = () => {
   const eligibleCategories = ELIGIBLE_CATEGORIES_BY_BAND[band] || ELIGIBLE_CATEGORIES_BY_BAND.Khumo;
 
   useEffect(() => {
-    fetchRecords<ListingFields>("Listings", `{Status} = 'Open'`)
-      .then(setListings)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    const loadListings = async () => {
+      try {
+        const data = await fetchRecords<ListingFields>("Listings", `{Status} = 'Open'`);
+        setListings(data);
+      } catch {
+        setListings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadListings();
+    const unsubscribe = subscribeToDataRefresh(loadListings);
+    return unsubscribe;
+  }, [band]);
 
   const filteredByCategory = filter === "All" ? listings : listings.filter((l) => l.fields.Category === filter);
   const filtered = user?.role === "investor"
@@ -115,7 +126,7 @@ const Marketplace = () => {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-muted-foreground">{pct}% funded</span>
-                      <span className="font-medium text-foreground">${(f["Amount Raised"] || 0).toLocaleString()} / ${f["Funding Goal"].toLocaleString()}</span>
+                      <span className="font-medium text-foreground">BWP {(f["Amount Raised"] || 0).toLocaleString()} / BWP {f["Funding Goal"].toLocaleString()}</span>
                     </div>
                     <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                       <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${pct}%` }} />

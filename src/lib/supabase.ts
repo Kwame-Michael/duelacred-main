@@ -1,4 +1,4 @@
-import { createClient, type PostgrestFilterBuilder } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -12,7 +12,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export const STORAGE_BUCKET = SUPABASE_STORAGE_BUCKET;
 export { SUPABASE_URL, SUPABASE_ANON_KEY };
 
-export interface AirtableRecord<T = Record<string, unknown>> {
+export interface RecordItem<T = Record<string, unknown>> {
   id: string;
   fields: T;
   createdTime?: string;
@@ -23,6 +23,8 @@ interface SupabaseRow<T = Record<string, unknown>> {
   fields: T;
   created_at: string;
 }
+
+export type AirtableRecord<T = Record<string, unknown>> = RecordItem<T>;
 
 const TABLE_NAME_MAP: Record<string, string> = {
   Users: "users",
@@ -36,7 +38,7 @@ const TABLE_NAME_MAP: Record<string, string> = {
 
 const normalizeTableName = (table: string) => TABLE_NAME_MAP[table] || table.toLowerCase();
 
-const applyJsonFilters = <T>(query: PostgrestFilterBuilder<SupabaseRow<T>>, filter: Record<string, unknown>) => {
+const applyJsonFilters = <T>(query: any, filter: Record<string, unknown>) => {
   for (const [key, value] of Object.entries(filter)) {
     query = query.eq(`fields->>${key}`, String(value));
   }
@@ -58,9 +60,9 @@ const normalizeFilter = (filter?: Record<string, unknown> | string): Record<stri
 export async function fetchRecords<T = Record<string, unknown>>(
   table: string,
   filter?: Record<string, unknown> | string
-): Promise<AirtableRecord<T>[]> {
+): Promise<RecordItem<T>[]> {
   const tableName = normalizeTableName(table);
-  let query = supabase.from<SupabaseRow<T>>(tableName).select("id, fields, created_at");
+  let query = supabase.from(tableName).select("id, fields, created_at") as any;
   const normalizedFilter = normalizeFilter(filter);
   if (normalizedFilter) {
     query = applyJsonFilters(query, normalizedFilter);
@@ -75,10 +77,10 @@ export async function fetchRecords<T = Record<string, unknown>>(
 export async function fetchRecord<T = Record<string, unknown>>(
   table: string,
   recordId: string
-): Promise<AirtableRecord<T>> {
+): Promise<RecordItem<T>> {
   const tableName = normalizeTableName(table);
   const { data, error } = await supabase
-    .from<SupabaseRow<T>>(tableName)
+    .from(tableName)
     .select("id, fields, created_at")
     .eq("id", recordId)
     .single();
@@ -99,7 +101,7 @@ async function getCurrentAuthId(): Promise<string | null> {
 export async function createRecord<T = Record<string, unknown>>(
   table: string,
   fields: Partial<T>
-): Promise<AirtableRecord<T>> {
+): Promise<RecordItem<T>> {
   const tableName = normalizeTableName(table);
   const authId = await getCurrentAuthId();
   const payload: Record<string, unknown> = { fields };
@@ -108,7 +110,7 @@ export async function createRecord<T = Record<string, unknown>>(
   }
 
   const { data, error } = await supabase
-    .from<SupabaseRow<T>>(tableName)
+    .from(tableName)
     .insert([payload])
     .select("id, fields, created_at")
     .single();
@@ -122,7 +124,7 @@ export async function updateRecord<T = Record<string, unknown>>(
   table: string,
   recordId: string,
   fields: Partial<T>
-): Promise<AirtableRecord<T>> {
+): Promise<RecordItem<T>> {
   const tableName = normalizeTableName(table);
   const existing = await fetchRecord<T>(table, recordId);
   const merged = { ...existing.fields, ...fields };
@@ -133,7 +135,7 @@ export async function updateRecord<T = Record<string, unknown>>(
   }
 
   const { data, error } = await supabase
-    .from<SupabaseRow<T>>(tableName)
+    .from(tableName)
     .update(payload)
     .eq("id", recordId)
     .select("id, fields, created_at")
@@ -213,10 +215,7 @@ export async function getSignedStorageUrl(bucket: string, path: string, expires 
 }
 
 export function getPublicFileUrl(bucket: string, path: string) {
-  const { data, error } = supabase.storage.from(bucket).getPublicUrl(path);
-  if (error) {
-    throw error;
-  }
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }
 

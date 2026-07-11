@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchRecords, createRecord, uploadFile, getPublicFileUrl, STORAGE_BUCKET, type AirtableRecord } from "@/lib/supabase";
+import { fetchRecords, createRecord, uploadFile, getPublicFileUrl, STORAGE_BUCKET, type RecordItem } from "@/lib/supabase";
+import { subscribeToDataRefresh } from "@/lib/refresh";
 import { useAuth } from "@/contexts/AuthContext";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,10 @@ import UploadBox from "@/components/onboarding/UploadBox";
 import Disclaimer from "@/components/onboarding/Disclaimer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wallet, TrendingUp, ArrowDownToLine, Briefcase, Plus, Sparkles } from "lucide-react";
+import { Wallet, TrendingUp, ArrowDownToLine, Briefcase, Plus, Sparkles, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { generatePaymentGuideBlob } from "@/lib/paymentGuide";
+import { calculateInvestorWalletBalance } from "@/lib/investorBalance";
 
 interface InvestmentFields {
   "Investor Email": string;
@@ -40,7 +43,7 @@ const bandStyles: Record<string, string> = {
 
 const InvestorDashboard = () => {
   const { user } = useAuth();
-  const [investments, setInvestments] = useState<AirtableRecord<InvestmentFields>[]>([]);
+  const [investments, setInvestments] = useState<RecordItem<InvestmentFields>[]>([]);
   const [loading, setLoading] = useState(true);
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [topUpFile, setTopUpFile] = useState<File | null>(null);
@@ -48,10 +51,12 @@ const InvestorDashboard = () => {
   const [walletBalance, setWalletBalance] = useState(0);
   const [walletStatus, setWalletStatus] = useState("Pending verification");
   const [band, setBand] = useState((typeof window !== "undefined" ? localStorage.getItem("duelacred_band") : null) || "Peo");
+  const [paymentGuideUrl, setPaymentGuideUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    (async () => {
+
+    const loadDashboardData = async () => {
       try {
         const [inv, onboarding] = await Promise.all([
           fetchRecords<InvestmentFields>("Investments", `{Investor Email} = '${user.email}'`),
@@ -72,7 +77,9 @@ const InvestorDashboard = () => {
             setWalletBalance(0);
             setWalletStatus("Pending verification");
           } else {
-            setWalletBalance(latest.fields["Amount Transferred"] || 0);
+            const verifiedFunding = latest.fields["Amount Transferred"] || 0;
+            const totalInvested = inv.reduce((sum, item) => sum + (item.fields["Amount Invested"] || 0), 0);
+            setWalletBalance(calculateInvestorWalletBalance(verifiedFunding, totalInvested));
             setWalletStatus("Active");
           }
         }
@@ -81,7 +88,11 @@ const InvestorDashboard = () => {
         setWalletStatus("Pending verification");
       }
       setLoading(false);
-    })();
+    };
+
+    loadDashboardData();
+    const unsubscribe = subscribeToDataRefresh(loadDashboardData);
+    return unsubscribe;
   }, [user]);
 
   if (loading) return <Spinner />;
@@ -89,12 +100,38 @@ const InvestorDashboard = () => {
   const totalInvested = investments.reduce((s, i) => s + (i.fields["Amount Invested"] || 0), 0);
   const totalReturned = investments.reduce((s, i) => s + ((i.fields["Expected Return"] || 0) * ((i.fields["Repayment Progress"] || 0) / 100)), 0);
   const active = investments.filter((i) => (i.fields.Status || "Active") !== "Completed").length;
-  const wallet = user?.wallet ?? 0;
+  const wallet = walletBalance;
 
   const submitTopUp = () => {
     if (!topUpFile || !topUpAmount) { toast.error("Add file and amount"); return; }
     toast.success("Top-up proof submitted for review");
     setTopUpFile(null); setTopUpAmount(""); setTopUpOpen(false);
+  };
+
+  const openPaymentGuide = async () => {
+    try {
+      const blob = await generatePaymentGuideBlob(user?.name || user?.email || "Your full name");
+      const url = URL.createObjectURL(blob);
+      setPaymentGuideUrl(url);
+      window.open(url, "_blank", "noopener,noreferrer,popup=yes,width=900,height=1200");
+    } catch {
+      toast.error("Unable to open the payment guide right now.");
+    }
+  };
+
+  const downloadPaymentGuide = async () => {
+    try {
+      const blob = await generatePaymentGuideBlob(user?.name || user?.email || "Your full name");
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "duela-cred-payment-methods.pdf";
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success("Payment guide downloaded");
+    } catch {
+      toast.error("Unable to download the payment guide right now.");
+    }
   };
 
   return (
@@ -105,6 +142,11 @@ const InvestorDashboard = () => {
           <Sparkles className="h-3 w-3" /> {band} band
         </span>
       </div>
+      {user && walletStatus.toLowerCase().includes("pending") && (
+        <div className="mb-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800">
+          <strong>Pending verification — limited access:</strong> Your wallet is being activated by our team. You can view opportunities but cannot invest until verification completes.
+        </div>
+      )}
       <p className="text-muted-foreground mb-8">Track your investments and returns</p>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -124,10 +166,25 @@ const InvestorDashboard = () => {
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-foreground">Active Campaigns</h2>
-        <Button size="sm" variant="outline" onClick={() => setTopUpOpen((v) => !v)}>
-          <Plus className="h-4 w-4 mr-1" /> Upload Additional Proof
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={openPaymentGuide}>
+            <Eye className="h-4 w-4 mr-1" /> View guide
+          </Button>
+          <Button size="sm" variant="outline" onClick={downloadPaymentGuide}>
+            <Download className="h-4 w-4 mr-1" /> Download
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setTopUpOpen((v) => !v)}>
+            <Plus className="h-4 w-4 mr-1" /> Upload Additional Proof
+          </Button>
+        </div>
       </div>
+
+      {paymentGuideUrl && (
+        <div className="bg-card rounded-xl border border-border p-4 mb-6">
+          <p className="text-sm text-muted-foreground mb-3">The guide is ready to open in a new tab. If your device blocks pop-ups, use the download button instead.</p>
+          <Button variant="outline" size="sm" onClick={() => window.open(paymentGuideUrl, "_blank", "noopener,noreferrer")}>Open full guide</Button>
+        </div>
+      )}
 
       {topUpOpen && (
         <div className="bg-card rounded-xl border border-border p-5 mb-6 space-y-4">

@@ -7,8 +7,11 @@ ALTER TABLE Users ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS users_self ON Users;
 CREATE POLICY users_self ON Users
   FOR ALL
-  USING (auth_id IS NULL OR auth.uid() = auth_id)
-  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id);
+  USING (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin')
+  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin');
+DROP POLICY IF EXISTS users_read_all ON Users;
+CREATE POLICY users_read_all ON Users
+  FOR SELECT USING (true);
 
 -- Investor_Onboarding: owners only
 ALTER TABLE IF EXISTS Investor_Onboarding ADD COLUMN IF NOT EXISTS auth_id uuid;
@@ -16,8 +19,11 @@ ALTER TABLE Investor_Onboarding ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS investor_onboarding_owner ON Investor_Onboarding;
 CREATE POLICY investor_onboarding_owner ON Investor_Onboarding
   FOR ALL
-  USING (auth_id IS NULL OR auth.uid() = auth_id)
-  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id);
+  USING (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin')
+  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin');
+DROP POLICY IF EXISTS investor_onboarding_read_all ON Investor_Onboarding;
+CREATE POLICY investor_onboarding_read_all ON Investor_Onboarding
+  FOR SELECT USING (true);
 
 -- SME_Applications: owners + admin
 ALTER TABLE IF EXISTS SME_Applications ADD COLUMN IF NOT EXISTS auth_id uuid;
@@ -25,8 +31,11 @@ ALTER TABLE SME_Applications ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS sme_owner ON SME_Applications;
 CREATE POLICY sme_owner ON SME_Applications
   FOR ALL
-  USING (auth_id IS NULL OR auth.uid() = auth_id)
-  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id);
+  USING (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin')
+  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin');
+DROP POLICY IF EXISTS sme_read_all ON SME_Applications;
+CREATE POLICY sme_read_all ON SME_Applications
+  FOR SELECT USING (true);
 
 -- Admin access helper (example using a custom claim 'role' = 'admin')
 -- Adjust according to your auth token contents.
@@ -66,13 +75,19 @@ ALTER TABLE Repayments ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS repayment_proofs_owner ON Repayment_Proofs;
 CREATE POLICY repayment_proofs_owner ON Repayment_Proofs
   FOR ALL
-  USING (auth_id IS NULL OR auth.uid() = auth_id)
-  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id);
+  USING (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin')
+  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin');
+DROP POLICY IF EXISTS repayment_proofs_read_all ON Repayment_Proofs;
+CREATE POLICY repayment_proofs_read_all ON Repayment_Proofs
+  FOR SELECT USING (true);
 DROP POLICY IF EXISTS repayments_owner ON Repayments;
 CREATE POLICY repayments_owner ON Repayments
   FOR ALL
-  USING (auth_id IS NULL OR auth.uid() = auth_id)
-  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id);
+  USING (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin')
+  WITH CHECK (auth_id IS NULL OR auth.uid() = auth_id OR auth.role() = 'service_role' OR auth.jwt() ->> 'role' = 'admin');
+DROP POLICY IF EXISTS repayments_read_all ON Repayments;
+CREATE POLICY repayments_read_all ON Repayments
+  FOR SELECT USING (true);
 
 -- Notes:
 -- These are templates. You should map `auth_id` on insert (e.g., via Edge Function or server) and

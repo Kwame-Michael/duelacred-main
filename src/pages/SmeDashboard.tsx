@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchRecords, createRecord, type AirtableRecord } from "@/lib/supabase";
+import { fetchRecords, createRecord, type RecordItem } from "@/lib/supabase";
+import { emitDataRefresh, subscribeToDataRefresh } from "@/lib/refresh";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,9 +47,9 @@ const STATUS_MAP: Record<string, { label: string; icon: React.ComponentType<{ cl
 
 const SmeDashboard = () => {
   const { user } = useAuth();
-  const [application, setApplication] = useState<AirtableRecord<AppFields> | null>(null);
-  const [listing, setListing] = useState<AirtableRecord<ListingFields> | null>(null);
-  const [repayments, setRepayments] = useState<AirtableRecord<RepaymentFields>[]>([]);
+  const [application, setApplication] = useState<RecordItem<AppFields> | null>(null);
+  const [listing, setListing] = useState<RecordItem<ListingFields> | null>(null);
+  const [repayments, setRepayments] = useState<RecordItem<RepaymentFields>[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [repayOpen, setRepayOpen] = useState(false);
@@ -57,10 +58,29 @@ const SmeDashboard = () => {
   const [repayFile, setRepayFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-    (async () => {
+    const loadDashboardData = async () => {
+      setLoading(true);
+      let emailToQuery: string | undefined = user?.email;
+
+      if (!emailToQuery) {
+        const stored = localStorage.getItem("duelacred_user");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            emailToQuery = parsed?.email;
+          } catch {
+            emailToQuery = undefined;
+          }
+        }
+      }
+
+      if (!emailToQuery) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const apps = await fetchRecords<AppFields>("SME_Applications", `{Submitted By Email} = '${user.email}'`);
+        const apps = await fetchRecords<AppFields>("SME_Applications", `{Submitted By Email} = '${emailToQuery}'`);
         if (apps.length > 0) {
           setApplication(apps[0]);
           if (apps[0].fields.Status === "Approved") {
@@ -72,9 +92,16 @@ const SmeDashboard = () => {
             }
           }
         }
-      } catch {}
-      setLoading(false);
-    })();
+      } catch (err) {
+        console.error("Error loading SME dashboard:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+    const unsubscribe = subscribeToDataRefresh(loadDashboardData);
+    return unsubscribe;
   }, [user]);
 
   const submitRepayment = async () => {
@@ -87,6 +114,7 @@ const SmeDashboard = () => {
         "Proof File": repayFile.name,
         Status: "Pending",
       });
+      emitDataRefresh("repayment-proof");
     } catch {}
     toast.success("Repayment proof submitted");
     setRepayOpen(false); setRepayAmount(""); setRepayFile(null);

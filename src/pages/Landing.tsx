@@ -104,16 +104,7 @@ const Landing = () => (
           Duela Tech is gearing up to launch. We are currently onboarding our first wave of investors and SMEs. Sign up to the waitlist and be first in line when we go live.
         </p>
         <div className="flex flex-wrap justify-center gap-4 pt-2">
-          <Button variant="gold" size="lg" asChild>
-            <Link to="/signup">Join as an Investor</Link>
-          </Button>
-          <Button
-            size="lg"
-            asChild
-            className="border-2 border-background text-background bg-transparent hover:bg-background/10"
-          >
-            <Link to="/signup">Apply as an SME</Link>
-          </Button>
+          {/* Signup buttons removed per product decision — waitlist remains */}
         </div>
         <p className="text-muted-foreground/60 text-sm pt-2">No commitment required. Just your spot in line.</p>
       </div>

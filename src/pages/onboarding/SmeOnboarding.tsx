@@ -25,7 +25,7 @@ const OPERATING = ["Less than 6 months", "6–12 months", "1–2 years", "Over 2
 const TOTAL = 6;
 
 const SmeOnboarding = () => {
-  const { login } = useAuth();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -45,15 +45,16 @@ const SmeOnboarding = () => {
   const goTo = (s: number) => setStep(s);
 
   const submit = async () => {
+    if (!user?.email) { toast.error("Please complete sign-in first."); return; }
     if (!agreed) { toast.error("Please confirm and agree to terms"); return; }
     setSubmitting(true);
     try {
-      await login(owner.fullName, owner.email.toLowerCase(), "sme");
+      const applicantEmail = user.email.toLowerCase();
       try {
-        const premisesPath = `sme-applications/${owner.email}/${Date.now()}-${docs.premises?.name}`;
-        const stockPath = `sme-applications/${owner.email}/${Date.now()}-${docs.stock?.name}`;
-        const selfiePath = `sme-applications/${owner.email}/${Date.now()}-${docs.selfie?.name}`;
-        const statementPath = `sme-applications/${owner.email}/${Date.now()}-${statement?.name}`;
+        const premisesPath = `sme-applications/${applicantEmail}/${Date.now()}-${docs.premises?.name}`;
+        const stockPath = `sme-applications/${applicantEmail}/${Date.now()}-${docs.stock?.name}`;
+        const selfiePath = `sme-applications/${applicantEmail}/${Date.now()}-${docs.selfie?.name}`;
+        const statementPath = `sme-applications/${applicantEmail}/${Date.now()}-${statement?.name}`;
 
         if (docs.premises) {
           await uploadFile(STORAGE_BUCKET, premisesPath, docs.premises, { cacheControl: 3600, upsert: true });
@@ -81,7 +82,7 @@ const SmeOnboarding = () => {
           Purpose: fin.useOf,
           "Repayment Period": "6 months",
           Status: "Pending",
-          "Submitted By Email": owner.email,
+          "Submitted By Email": applicantEmail,
           "Owner Name": owner.fullName,
           "Owner Phone": owner.phone,
           Omang: owner.omang,

@@ -17,6 +17,7 @@ const Footer = () => (
             <li><Link to="/marketplace" className="hover:text-primary-foreground transition-colors">Marketplace</Link></li>
             <li><Link to="/auth" className="hover:text-primary-foreground transition-colors">Start Investing</Link></li>
             <li><Link to="/auth?role=sme" className="hover:text-primary-foreground transition-colors">Apply for Funding</Link></li>
+            <li><Link to="/dashboard/admin" className="hover:text-primary-foreground transition-colors">Admin</Link></li>
           </ul>
         </div>
         <div>

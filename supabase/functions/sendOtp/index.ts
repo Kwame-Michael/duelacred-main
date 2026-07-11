@@ -1,12 +1,13 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "send@duelacred.com";
 const ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5173", "http://localhost:8080", "https://localhost:3000", "https://localhost:5173", "https://localhost:8080"];
 
 const corsHeaders = (origin?: string) => ({
   "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.includes(origin) ? origin : "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
   "Access-Control-Max-Age": "86400",
 });
 
@@ -18,11 +19,20 @@ serve(async (req) => {
   }
 
   try {
-    const { email, otp, senderEmail = "onboarding@resend.dev" } = await req.json();
+    const { email, otp, senderEmail } = await req.json();
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
 
-    if (!email || !otp) {
+    if (!normalizedEmail || !otp) {
       return new Response(
         JSON.stringify({ error: "Missing email or OTP" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
+      );
+    }
+
+    if (!isValidEmail) {
+      return new Response(
+        JSON.stringify({ error: "That email address is not valid. Please enter a valid email address and try again." }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
       );
     }
@@ -35,6 +45,8 @@ serve(async (req) => {
       );
     }
 
+    const resolvedSender = senderEmail || RESEND_FROM_EMAIL;
+
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -42,8 +54,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: senderEmail,
-        to: email,
+        from: resolvedSender,
+        to: normalizedEmail,
         subject: "Your Duelacred OTP",
         html: `
           <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -61,10 +73,12 @@ serve(async (req) => {
 
     const data = await response.json();
 
+    const isRecipientValidationError = response.status >= 400 && typeof data?.message === "string" && /not valid|validation|recipient|domain|verify/i.test(data.message);
+
     if (!response.ok) {
       console.error("Resend API error:", data);
       return new Response(
-        JSON.stringify({ error: "Failed to send email", details: data }),
+        JSON.stringify({ error: isRecipientValidationError ? "The email address could not be delivered. Please use a valid address and try again." : "Failed to send email", details: data }),
         { status: response.status, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
       );
     }

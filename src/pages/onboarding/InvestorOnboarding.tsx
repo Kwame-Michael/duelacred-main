@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,12 @@ import StepProgress from "@/components/onboarding/StepProgress";
 import UploadBox from "@/components/onboarding/UploadBox";
 import Disclaimer from "@/components/onboarding/Disclaimer";
 import SuccessScreen from "@/components/onboarding/SuccessScreen";
-import { Sprout, TreeDeciduous, Flame, ArrowLeft, AlertCircle } from "lucide-react";
+import { Sprout, TreeDeciduous, Flame, ArrowLeft, AlertCircle, Download, Eye } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createRecord, uploadFile, getSignedStorageUrl, STORAGE_BUCKET } from "@/lib/supabase";
+import { clearNewInvestorSignup } from "@/lib/onboarding";
+import { generatePaymentGuideBlob } from "@/lib/paymentGuide";
+import { emitDataRefresh } from "@/lib/refresh";
 import { toast } from "sonner";
 
 type Band = "Peo" | "Kgolo" | "Khumo";
@@ -60,8 +63,12 @@ const TOTAL_STEPS = 4;
 
 const InvestorOnboarding = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    clearNewInvestorSignup();
+  }, []);
 
   // Step 2
   const [personal, setPersonal] = useState({ fullName: "", email: "", phone: "", nationalId: "" });
@@ -107,21 +114,22 @@ const InvestorOnboarding = () => {
   };
 
   const submit = async () => {
+    if (!user?.email) { toast.error("Please complete sign-in first."); return; }
     if (!file) { toast.error("Please upload proof of payment"); return; }
     if (!amount) { toast.error("Enter the amount transferred"); return; }
     setSubmitting(true);
     try {
-      await login(personal.fullName, personal.email.toLowerCase(), "investor");
+      const applicantEmail = user.email.toLowerCase();
       if (band) {
         localStorage.setItem("duelacred_band", band);
       }
       try {
-        const proofPath = `investor-onboarding/${personal.email}/${Date.now()}-${file.name}`;
+        const proofPath = `investor-onboarding/${applicantEmail}/${Date.now()}-${file.name}`;
         await uploadFile(STORAGE_BUCKET, proofPath, file, { cacheControl: 3600, upsert: true });
         const proofUrl = await getSignedStorageUrl(STORAGE_BUCKET, proofPath);
         await createRecord("Investor_Onboarding", {
           "Full Name": personal.fullName,
-          Email: personal.email,
+          Email: applicantEmail,
           Phone: personal.phone,
           "National ID": personal.nationalId,
           Band: band,
@@ -132,6 +140,7 @@ const InvestorOnboarding = () => {
           Status: "Pending Verification",
           "Created Date": new Date().toISOString().split("T")[0],
         });
+        emitDataRefresh("investor-onboarding");
       } catch (error) {
         console.error(error);
         toast.error("Unable to save your payment proof. Please try again.");
@@ -260,10 +269,41 @@ const InvestorOnboarding = () => {
           </p>
 
           <div className="bg-foreground text-background rounded-xl p-5 mb-6 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="opacity-70">Bank</span><span className="font-semibold">First National Bank Botswana</span></div>
+            <div className="flex justify-between"><span className="opacity-70">Bank Transfer</span><span className="font-semibold">First National Bank Botswana</span></div>
             <div className="flex justify-between"><span className="opacity-70">Account Name</span><span className="font-semibold">Duela Cred (Pty) Ltd</span></div>
             <div className="flex justify-between"><span className="opacity-70">Account Number</span><span className="font-semibold">62812345678</span></div>
             <div className="flex justify-between"><span className="opacity-70">Reference</span><span className="font-semibold text-accent">{personal.fullName || "Your full name"}</span></div>
+            <div className="flex justify-between"><span className="opacity-70">Orange Money</span><span className="font-semibold">+267 71 000 000</span></div>
+            <div className="flex justify-between"><span className="opacity-70">MyZaka</span><span className="font-semibold">+267 72 000 000</span></div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-6">
+            <Button variant="outline" size="sm" onClick={async () => {
+              try {
+                const blob = await generatePaymentGuideBlob(personal.fullName || "Your full name");
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank", "noopener,noreferrer,popup=yes,width=900,height=1200");
+              } catch {
+                toast.error("Unable to open the payment guide right now.");
+              }
+            }}>
+              <Eye className="h-4 w-4 mr-2" /> View payment guide
+            </Button>
+            <Button variant="outline" size="sm" onClick={async () => {
+              try {
+                const blob = await generatePaymentGuideBlob(personal.fullName || "Your full name");
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "duela-cred-payment-methods.pdf";
+                link.click();
+                URL.revokeObjectURL(url);
+              } catch {
+                toast.error("Unable to download the payment guide right now.");
+              }
+            }}>
+              <Download className="h-4 w-4 mr-2" /> Download PDF
+            </Button>
           </div>
 
           <Label className="block mb-2">Upload Proof of Payment</Label>

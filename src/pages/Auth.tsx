@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import logo from "@/assets/duela_cred_logo.png";
 import { toast } from "sonner";
+import { markNewInvestorSignup, resolvePostAuthDestination } from "@/lib/onboarding";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -28,8 +29,9 @@ const Auth = () => {
           return;
         }
         if (session?.user) {
+          const destination = await resolvePostAuthDestination(session.user.email || "", searchParams.get("role") === "sme" ? "sme" : "investor");
           toast.success("Signed in successfully!");
-          navigate(searchParams.get("role") === "sme" ? "/dashboard/sme" : "/dashboard/investor");
+          navigate(destination);
         }
       })();
     }
@@ -37,11 +39,37 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate(user.role === "sme" ? "/dashboard/sme" : "/dashboard/investor");
+      (async () => {
+        const destination = await resolvePostAuthDestination(user.email, user.role);
+        navigate(destination);
+      })();
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      toast.error("Please enter your email");
+      return;
+    }
+    setLoading(true);
+    try {
+      const otpSent = await login("", email.trim(), role);
+      if (otpSent) {
+        setSent(true);
+        toast.success("We sent a 6-digit code to your email.");
+      } else {
+        toast.success("Signed in successfully!");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) {
       toast.error("Please fill in all fields");
@@ -49,10 +77,16 @@ const Auth = () => {
     }
     setLoading(true);
     try {
-      await login(name.trim(), email.trim(), role);
-      setSent(true);
-      toast.success("We sent a 6-digit code to your email.");
+      markNewInvestorSignup();
+      const otpSent = await login(name.trim(), email.trim(), role);
+      if (otpSent) {
+        setSent(true);
+        toast.success("We sent a 6-digit code to your email.");
+      } else {
+        toast.success("Account ready. You can continue.");
+      }
     } catch (error) {
+      localStorage.removeItem("duelacred_new_investor_signup");
       const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
       toast.error(message);
     } finally {
@@ -69,8 +103,9 @@ const Auth = () => {
     setLoading(true);
     try {
       await verifyOtp(email.trim(), otp.trim());
+      const destination = await resolvePostAuthDestination(email.trim(), role);
       toast.success("Signed in successfully!");
-      navigate(role === "sme" ? "/dashboard/sme" : "/dashboard/investor");
+      navigate(destination);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to verify your code.";
       toast.error(message);
@@ -99,7 +134,7 @@ const Auth = () => {
             <p className="text-sm text-muted-foreground">If you don't see it, check spam or wait a minute before requesting another code.</p>
           </form>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-border p-6 space-y-4 shadow-sm">
+          <div className="bg-card rounded-xl border border-border p-6 space-y-4 shadow-sm">
             <div>
               <label className="text-sm font-medium text-foreground">Full Name</label>
               <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Amina Okafor" className="mt-1" />
@@ -131,10 +166,20 @@ const Auth = () => {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading ? "Sending link…" : "Continue"}
-            </Button>
-          </form>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <form onSubmit={handleSignIn} className="space-y-3">
+                <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                  {loading ? "Sending code…" : "Sign in"}
+                </Button>
+              </form>
+              <form onSubmit={handleCreateAccount} className="space-y-3">
+                <Button type="submit" variant="secondary" className="w-full" size="lg" disabled={loading}>
+                  {loading ? "Sending code…" : "Create account"}
+                </Button>
+              </form>
+            </div>
+          </div>
         )}
       </div>
     </div>
